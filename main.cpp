@@ -3,10 +3,13 @@
 
 #include "game.h"
 #include "player.h"
+#include "alien.h"
 
 int main(int argc, char **argv) {
 
     Jogo jogo;
+
+    Alien alien[LINHAS_TROPA][COLUNAS_TROPA];
 
     inicializa_jogo (&jogo, 640, 480);
 
