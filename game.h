@@ -3,6 +3,7 @@
 
 #include "player.h"
 #include "projetil.h"
+#include "alien.h"
 
 #define N_KEYS 3
 #define FPS 60
@@ -17,6 +18,7 @@ struct Jogo {
 	bool key[N_KEYS];
 
 	Player player;
+	Alien alien[COLUNAS_TROPA][LINHAS_TROPA];
 	Projetil* projetil_stack[50];
 	int numero_de_projeteis;
 };
