@@ -6,6 +6,7 @@
 #include "game.h"
 #include "player.h"
 #include "projetil.h"
+#include "alien.h"
 
 void inicializa_jogo (Jogo* jogo, int largura, int altura) {
 
@@ -28,6 +29,7 @@ void inicializa_jogo (Jogo* jogo, int largura, int altura) {
 	inicializa_teclado(jogo);
 	inicializa_event_queue(jogo);
 	inicializa_player(&jogo->player, jogo->largura/2, jogo->altura/12*10);
+	inicializa_tropa(jogo->alien, jogo->largura/10, jogo->altura/12);
 }
 	
 void finaliza_jogo (Jogo* jogo) {
@@ -40,6 +42,8 @@ void desenha_jogo (Jogo* jogo) {
 	desenha_fundo(jogo);
 
 	desenha_player(&jogo->player);
+
+	desenha_tropa(jogo->alien);
 
 	al_flip_display();
 }
