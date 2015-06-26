@@ -81,4 +81,5 @@ int get_posicao_x_max_alien (Alien* alien){
 
 int get_posicao_x_min_alien (Alien* alien){
 	return alien->posicao_x - alien->delta_x;
+	puts("fodase");
 }
