@@ -85,6 +85,7 @@ void loop_de_jogo (Jogo* jogo) {
   jogo->loop_count_menu_pause = 1;
   jogo->menu.new_game = 0;
   jogo->loop_alien_movement = 0;
+  jogo->loop_alien_shots = 0;
 	
   while (!doexit) {
 		ALLEGRO_EVENT ev;
@@ -172,10 +173,16 @@ void loop_de_jogo (Jogo* jogo) {
           jogo->loop_count++;
           jogo->loop_count_menu_pause++;
           jogo->loop_alien_movement++;
+		jogo->loop_alien_shots++;
           //dá pra fazer uma funçao com tudo isto
 
           if (!(jogo->loop_alien_movement % (FPS/2)))
               rota_tropa (jogo->alien, jogo);
+
+		if (!(jogo->loop_alien_shots % (FPS/2*3))) {
+			atira_tropa (jogo->alien, &jogo->projetil_stack[jogo->numero_de_projeteis]);
+			jogo->numero_de_projeteis++; 
+		}
 
           desenha_jogo(jogo);
 
@@ -185,8 +192,8 @@ void loop_de_jogo (Jogo* jogo) {
 }
 
 void desenha_fundo_jogo (Jogo* jogo) {
-	al_clear_to_color(al_map_rgb(0,0,0));
-  // al_draw_bitmap (jogo->fundo, 0, 0, 0);
+  //	al_clear_to_color(al_map_rgb(0,0,0));
+   al_draw_bitmap (jogo->fundo, 0, 0, 0);
 }
 
 void inicializa_teclado (Jogo* jogo) {
