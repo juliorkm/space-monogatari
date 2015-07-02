@@ -25,27 +25,27 @@ struct Alien {
 
 void inicializa_alien (Alien* alien, int posicao_x, int posicao_y);
 
-void inicializa_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], int posicao_x, int posicao_y);
+void inicializa_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], int posicao_x, int posicao_y);
 
 void finaliza_alien (Alien* alien);
 
 void desenha_alien (Alien* alien);
 
-void desenha_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA]);
+void desenha_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA]);
 
 void inicializa_sprites_alien (Alien* alien);
 
 void finaliza_sprites_alien (Alien* alien);
 
-void muda_direcao_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], DIRECAO direcao);
+void muda_direcao_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], DIRECAO direcao);
 
 void move_alien (Alien* alien, DIRECAO direcao);
 
-void move_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], DIRECAO direcao);
+void move_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], DIRECAO direcao);
 
-void rota_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], Jogo* jogo);
+void rota_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], Jogo* jogo);
 
-void atira_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], Projetil* projetil);
+void atira_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], Projetil* projetil);
 
 void colisao_alien_vs_projetil (Jogo *jogo);
 
