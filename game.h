@@ -20,7 +20,8 @@ struct Jogo {
 
 	Player player;
 	Mothership mothership;
-	Alien alien[COLUNAS_TROPA][LINHAS_TROPA];
+	Alien alien[COLUNAS_TROPA * LINHAS_TROPA];
+	int aliens_vivos;
 	Menu menu;
 	Hud hud;
 
