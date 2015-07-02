@@ -7,7 +7,7 @@
 #include "alien.h"
 #include "game.h"
 
-void inicializa_alien (Alien* alien, int posicao_x, int posicao_y) {
+void inicializa_alien (Alien* alien, int posicao_x, int posicao_y, int coord_x, int coord_y) {
 	alien->posicao_x = posicao_x;
 	alien->posicao_y = posicao_y;
 
@@ -17,17 +17,22 @@ void inicializa_alien (Alien* alien, int posicao_x, int posicao_y) {
 
 	alien->direcao_atual = DIREITA;
 
+	alien->coord[0] = coord_x;
+	alien->coord[1] = coord_y;
+
 	inicializa_sprites_alien (alien);
 
 	alien->delta_x = LARGURA_SPRITES_ALIEN/2;
 	alien->delta_y = ALTURA_SPRITES_ALIEN/2;
 }
 
-void inicializa_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], int posicao_x, int posicao_y) {
+void inicializa_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], int posicao_x, int posicao_y) {
 	for (int i = 0; i < COLUNAS_TROPA; i++)
-		for (int j = 0; j < LINHAS_TROPA; j++)
-			inicializa_alien (&alien[i][j], posicao_x + i * (LARGURA_SPRITES_ALIEN + LARGURA_SPRITES_ALIEN/2),
-									posicao_y + j * (ALTURA_SPRITES_ALIEN + ALTURA_SPRITES_ALIEN/2) ); 
+		for (int j = 0; j < LINHAS_TROPA; j++) {
+			inicializa_alien (&alien[i * LINHAS_TROPA + j], posicao_x + i * (LARGURA_SPRITES_ALIEN + LARGURA_SPRITES_ALIEN/2),
+									posicao_y + j * (ALTURA_SPRITES_ALIEN + ALTURA_SPRITES_ALIEN/2), i, j ); 
+/*if (i!=0 && j%2==0) alien[i * LINHAS_TROPA + j].vivo = false;*/} 
+
 }
 
 void finaliza_alien (Alien* alien) {
@@ -54,11 +59,12 @@ void desenha_alien (Alien* alien) {
 						  flags);
 }
 
-void desenha_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA]) {
+void desenha_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA]) {
 	for (int i = 0; i < COLUNAS_TROPA; i++)
-		for (int j = 0; j < LINHAS_TROPA; j++)
-			if (alien[i][j].vivo)
-				desenha_alien (&alien[i][j]);
+		for (int j = 0; j < LINHAS_TROPA; j++) {
+			if (alien[i * LINHAS_TROPA + j].vivo)
+				desenha_alien (&alien[i * LINHAS_TROPA + j]);
+		}
 }
 
 void inicializa_sprites_alien (Alien* alien) {
@@ -81,10 +87,10 @@ void finaliza_sprites_alien (Alien* alien) {
 	al_destroy_bitmap(alien->sprites[0]);
 }
 
-void muda_direcao_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], DIRECAO direcao) {
+void muda_direcao_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], DIRECAO direcao) {
 	for (int i = 0; i < COLUNAS_TROPA; i++)
 		for (int j = 0; j < LINHAS_TROPA; j++)
-			alien[i][j].direcao_atual = direcao;
+			alien[i * LINHAS_TROPA + j].direcao_atual = direcao;
 }
 
 void move_alien (Alien* alien, DIRECAO direcao) {
@@ -110,85 +116,72 @@ void move_alien (Alien* alien, DIRECAO direcao) {
 	}
 }
 
-void move_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], DIRECAO direcao) {
-	if (direcao == ESQUERDA) {
-		for (int i = 0; i < COLUNAS_TROPA; i++) {
-			for (int j = 0; j < LINHAS_TROPA; j++) {
-				move_alien (&alien[i][j], ESQUERDA);
-			}
+void move_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], DIRECAO direcao) {
+//	if (direcao == ESQUERDA) {
+	for (int i = 0; i < COLUNAS_TROPA; i++) {
+		for (int j = 0; j < LINHAS_TROPA; j++) {
+			move_alien (&alien[i * LINHAS_TROPA + j], direcao);
 		}
 	}
-
-	if (direcao == DIREITA) {
-		for (int i = 0; i < COLUNAS_TROPA; i++) {
-			for (int j = 0; j < LINHAS_TROPA; j++) {
-				move_alien (&alien[i][j], DIREITA);
-			}
-		}
-	}
-
-	if (direcao == CIMA) {
-		for (int i = 0; i < COLUNAS_TROPA; i++) {
-			for (int j = 0; j < LINHAS_TROPA; j++) {
-				move_alien (&alien[i][j], CIMA);
-			}
-		}
-	}
-
-	if (direcao == BAIXO) {
-		for (int i = 0; i < COLUNAS_TROPA; i++) {
-			for (int j = 0; j < LINHAS_TROPA; j++) {
-				move_alien (&alien[i][j], BAIXO);
-			}
-		}
-	}
-
 }
 
-void rota_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], Jogo* jogo) {
-	if (alien[0][0].direcao_atual == ESQUERDA && get_posicao_x_min_alien(&alien[0][0]) > 0 + 10 + alien[0][0].velocidade)
+void rota_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], Jogo* jogo) {
+	if (alien[0].direcao_atual == ESQUERDA && get_posicao_x_min_alien(&alien[0]) > 0 + 10 + alien[0].velocidade)
 		move_tropa (alien, ESQUERDA);
 
-	if (get_posicao_x_min_alien(&alien[0][0]) <= 0 + 10 + alien[0][0].velocidade) {
+	if (get_posicao_x_min_alien(&alien[0]) <= 0 + 10 + alien[0].velocidade) {
 			move_tropa (alien, BAIXO);
 			muda_direcao_tropa(alien, DIREITA);
 	}
 
-	if (get_posicao_x_max_alien(&alien[COLUNAS_TROPA-1][0]) >= jogo->largura - 10 - alien[0][0].velocidade) {
+	if (get_posicao_x_max_alien(&alien[(COLUNAS_TROPA-1) * LINHAS_TROPA + 0]) >= jogo->largura - 10 - alien[0].velocidade) {
 			move_tropa (alien, BAIXO);
 			muda_direcao_tropa(alien, ESQUERDA);
 	}
 
-	if (alien[COLUNAS_TROPA-1][0].direcao_atual == DIREITA && get_posicao_x_max_alien(&alien[COLUNAS_TROPA-1][0]) < jogo->largura - 10 - alien[0][0].velocidade)
+	if (alien[(COLUNAS_TROPA-1) * LINHAS_TROPA + 0].direcao_atual == DIREITA && get_posicao_x_max_alien(&alien[(COLUNAS_TROPA-1) * LINHAS_TROPA + 0]) < jogo->largura - 10 - alien[0].velocidade)
 		move_tropa (alien, DIREITA);
 
 }
 
-void atira_tropa (Alien alien[COLUNAS_TROPA][LINHAS_TROPA], Projetil* projetil) {
+void atira_tropa (Alien alien[COLUNAS_TROPA * LINHAS_TROPA], Projetil* projetil) {
+	int pode_atirar[COLUNAS_TROPA];
+	int quem_atira_x;
+	int quem_atira_y;
+	for (int i = 0; i < COLUNAS_TROPA; i++)
+		for (int j = LINHAS_TROPA; j > -2; j++) {
+			if (j == -1) {
+				pode_atirar[i] = -1;
+				break;
+			}
+			if (alien[i + COLUNAS_TROPA + j].vivo == true) {
+				pode_atirar[i] = j;
+				break;
+			}
+		}
+
 	srand(time(NULL));
-	int quem_atira_x = rand() % COLUNAS_TROPA;
-	int quem_atira_y = LINHAS_TROPA-1;
-
-	while (!alien[quem_atira_x][0].vivo)
+	quem_atira_x = rand() % COLUNAS_TROPA;
+	while (pode_atirar[quem_atira_x] < 0) {
+puts("i tried");
 		quem_atira_x = (quem_atira_x+1) % COLUNAS_TROPA;
+	}
+	quem_atira_y = pode_atirar[quem_atira_x];
 
-	while (!alien[quem_atira_x][quem_atira_y].vivo && quem_atira_y > 0)
-		quem_atira_y--;
-
-	inicializa_projetil(projetil, alien[quem_atira_x][quem_atira_y].posicao_x + alien[quem_atira_x][quem_atira_y].delta_x,
-								alien[quem_atira_x][quem_atira_y].posicao_y + al_get_bitmap_height(alien[0][0].sprites[0]), BAIXO);	
-		
+	inicializa_projetil (projetil, alien[quem_atira_x * LINHAS_TROPA + quem_atira_y].posicao_x +
+		alien[quem_atira_x * LINHAS_TROPA + quem_atira_y].delta_x,
+		alien[quem_atira_x * LINHAS_TROPA + quem_atira_y].posicao_y + al_get_bitmap_height(alien[0].sprites[0]), BAIXO);
 }
 
 void colisao_alien_vs_projetil (Jogo *jogo) {
 	for (int i = 0; i < jogo->numero_de_projeteis; i++) {
 		for (int j = 0; j < COLUNAS_TROPA; j++) {
 			for (int v = 0; v < LINHAS_TROPA; v++) {
-				if ((!(get_posicao_x_min_projetil(&jogo->conjunto_projeteis[i]) > get_posicao_x_max_alien(&jogo->alien[j][v])
-					|| get_posicao_y_min_projetil(&jogo->conjunto_projeteis[i]) > get_posicao_y_max_alien(&jogo->alien[j][v])
-					|| get_posicao_y_max_projetil(&jogo->conjunto_projeteis[i]) < get_posicao_y_min_alien(&jogo->alien[j][v])
-					|| get_posicao_x_max_projetil(&jogo->conjunto_projeteis[i]) < get_posicao_x_min_alien(&jogo->alien[j][v])))
-					&& jogo->alien[j][v].vivo) {
+				if ((!(get_posicao_x_min_projetil(&jogo->conjunto_projeteis[i]) > get_posicao_x_max_alien(&jogo->alien[j * LINHAS_TROPA + v])
+					|| get_posicao_y_min_projetil(&jogo->conjunto_projeteis[i]) > get_posicao_y_max_alien(&jogo->alien[j * LINHAS_TROPA + v])
+					|| get_posicao_y_max_projetil(&jogo->conjunto_projeteis[i]) < get_posicao_y_min_alien(&jogo->alien[j * LINHAS_TROPA + v])
+					|| get_posicao_x_max_projetil(&jogo->conjunto_projeteis[i]) < get_posicao_x_min_alien(&jogo->alien[j * LINHAS_TROPA + v])))
+					&& jogo->alien[j * LINHAS_TROPA + v].vivo) {
 
 						copy_projetil (&jogo->conjunto_projeteis[i], &jogo->conjunto_projeteis[jogo->numero_de_projeteis-1]);
 						desenha_projetil (&jogo->conjunto_projeteis[i]);
@@ -197,7 +190,7 @@ void colisao_alien_vs_projetil (Jogo *jogo) {
 						jogo->numero_de_projeteis--;
 						jogo->hud.score += PONTOS_ALIEN;
 
-						jogo->alien[j][v].vivo = false;
+						jogo->alien[j * LINHAS_TROPA + v].vivo = false;
 
 						return;
 				}
