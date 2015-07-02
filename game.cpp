@@ -56,6 +56,7 @@ void inicializa_jogo (Jogo* jogo, int fase) {
     inicializa_mothership(&jogo->mothership, jogo);
     inicializa_hud(&jogo->hud);
     inicializa_tropa(jogo->alien, ((jogo->largura - 20) - (1.5*LARGURA_SPRITES_ALIEN*COLUNAS_TROPA - LARGURA_SPRITES_ALIEN/2)) / 2 , 1.5*ALTURA_SPRITES_ALIEN);
+    jogo->aliens_vivos = COLUNAS_TROPA * LINHAS_TROPA;
     
     for (int i = 0; i < jogo->numero_shields; i++)
         inicializa_shield(&jogo->shields[i],
